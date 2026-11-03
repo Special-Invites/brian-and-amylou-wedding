@@ -61,19 +61,14 @@
   #env .e-card { z-index: 2; left: 5%; right: 5%; top: 6%; bottom: auto; width: 90%; height: 92%; background: #fbf4e6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--burgundy); box-shadow: 0 2px 8px rgba(0,0,0,.35); transition: transform 1.1s cubic-bezier(.4,0,.2,1) .7s; }
   #env .e-card::before { content: ""; position: absolute; inset: 5px; border: 1px solid #D4AF37; }
   #env .e-card::after { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(212,175,55,.45); }
-  /* monogram image: ornate B + A with a swash (static/imgs/monogram.svg) */
-  .e-card .mono { display: block; width: 40%; max-width: 112px; height: auto; margin: 0 auto; }
-  /* names: GOLD, same serif font as the reference design (the & is gold too) */
-  .e-card .nm { display: block; font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .05em; color: #B8902F; margin-top: 8px; }
-  .e-card .nm .amp { color: #C49A2C; padding: 0 .12em; }
-  /* date: BLUE */
-  .e-card .dt { display: block; font-family: var(--font-display); letter-spacing: .18em; font-size: 10px; color: var(--blue); margin-top: 4px; font-weight: 600; }
+  /* capsule monogram (static/imgs/capsule.svg): B&A + names + date, one image */
+  .e-card .capsule { display: block; height: 82%; width: auto; margin: 0 auto; }
   #env .e-front { z-index: 3; filter: drop-shadow(0 -2px 3px rgba(0,0,0,.3)); }   /* soft shadow so the letter looks tucked inside the pocket */
   #env .e-flap { z-index: 4; height: 50%;   /* 50% = the flap tip lands exactly in the middle of the envelope */ transform-origin: top center; transition: transform .8s ease, z-index 0s linear .4s; }
   .e-flap span { position: absolute; inset: 0; display: block; clip-path: polygon(0 0, 100% 0, 50% 100%); }
   .f-out { background: linear-gradient(#1b4496, #0f2f73); transition: opacity 0s linear .4s; }
   .f-in { background: linear-gradient(#e6d9bd, #f6ecd8); opacity: 0; transition: opacity 0s linear .4s; }
-  #env .e-seal { z-index: 5; position: absolute; inset: auto; left: 50%; top: 50%; width: 22%; height: auto; aspect-ratio: 1; transform: translate(-50%, -50%); transition: opacity .35s ease, transform .5s ease; }
+  #env .e-seal { z-index: 5; position: absolute; inset: auto; left: 50%; top: 50%; width: 29%; height: auto; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); transform: translate(-50%, -50%); transition: opacity .35s ease, transform .5s ease; }
   .open #env .e-flap { transform: scaleY(-1); z-index: 1; }   /* "#env" is needed here, otherwise the earlier "#env .e-flap" rule wins and the flap stays in front of the letter */
   .open .f-out { opacity: 0; } .open .f-in { opacity: 1; }
   .open .e-seal { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
@@ -259,9 +254,7 @@
   .ec-final { position: relative; z-index: 2; width: min(250px, 72%); margin: 30px auto 0; padding: 24px 18px 20px; background: #fbf4e6; text-align: center; color: var(--burgundy); box-shadow: 0 8px 22px rgba(0,0,0,.35); }
   .ec-final::before { content: ""; position: absolute; inset: 6px; border: 1px solid #D4AF37; pointer-events: none; }
   .ec-final::after { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(212,175,55,.45); pointer-events: none; }
-  .ec-final .mono { width: 62%; max-width: 150px; }
-  .ec-final .nm { font-size: 17px; margin-top: 10px; }
-  .ec-final .dt { font-size: 12px; margin-top: 6px; }
+  .ec-final .capsule { height: auto; width: 74%; max-width: 190px; }
   .sign { font-size: 38px; font-style: italic; color: var(--blue); margin-top: 22px; }
 
   /* alternating navy / burgundy sections */
@@ -313,7 +306,6 @@
   <defs>
     <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .1 0 0 0 .5 0"/></filter>
     <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16398a"/><stop offset="1" stop-color="#0a2258"/></linearGradient>
-    <radialGradient id="wax" cx=".35" cy=".28" r=".8"><stop offset="0" stop-color="#f1d98a"/><stop offset=".55" stop-color="#c9a13c"/><stop offset="1" stop-color="#8a6a1a"/></radialGradient>
     <linearGradient id="foil" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b8902f"/><stop offset=".35" stop-color="#f0dc96"/><stop offset=".6" stop-color="#c9a54a"/><stop offset="1" stop-color="#e9d27e"/></linearGradient>
     <!-- The curly dash used beside every section title (same drawing as the countdown's) -->
     <symbol id="flourish" viewBox="0 0 64 18"><path vector-effect="non-scaling-stroke" d="M62 9H40C34 9 31 5 25 5 17 5 14 11 18 14 22 17 28 13 25 9.5 23.5 8 21 9 21.5 10.5"/><path vector-effect="non-scaling-stroke" d="M44 9C45 5 50 3.5 53 4 52 7.5 48.5 9 44 9ZM52 9C53 13 57 14.5 60 14 59 10.5 56 9 52 9Z"/><circle cx="5" cy="9" r="1" fill="currentColor" stroke="none"/></symbol>
@@ -339,7 +331,7 @@
       <div class="env-shadow"></div>
       <button id="env" aria-label="Tap the envelope to open the invitation">
         <span class="e-back"></span>
-        <span class="e-card"><img class="mono" src="static/imgs/monogram-exact.png" alt="B and A monogram" width="1230" height="854"><span class="nm">Brian <span class="amp">&amp;</span> Amylou</span><span class="dt">12.15.2026</span></span>
+        <span class="e-card"><img class="capsule" src="static/imgs/capsule.svg" alt="Brian &amp; Amylou, B&amp;A monogram, 12.15.26"></span>
         <svg class="e-front" viewBox="0 0 300 180" aria-hidden="true">
           <!-- The front is a "pocket": left, right and bottom triangles all meet at the exact center (150, 90).
                The top V is left open on purpose, so the letter can be seen rising out from INSIDE. -->
@@ -350,15 +342,8 @@
           <rect width="300" height="180" filter="url(#grain)" opacity=".35" clip-path="url(#pocket)"/>
         </svg>
         <span class="e-flap"><span class="f-out"></span><span class="f-in"></span></span>
-        <svg class="e-seal" viewBox="0 0 70 70" aria-hidden="true">
-          <!-- translate(0 2.5) nudges the wax drawing down so it is centered inside its own box -->
-          <g transform="translate(0 2.5)">
-            <path d="M35 2C47 1 56 6 62 14C70 20 67 33 63 40C64 51 54 59 43 60C36 65 26 61 20 57C8 57 2 45 5 36C1 26 8 15 17 12C21 4 28 3 35 2Z" fill="url(#wax)"/>
-            <circle cx="35" cy="32" r="21" fill="none" stroke="#6b4e10" stroke-opacity=".5" stroke-width="1.2"/>
-            <text x="36" y="40" text-anchor="middle" font-family="Playfair Display,serif" font-style="italic" font-size="21" fill="#fff3c0" fill-opacity=".8">B&amp;A</text>
-            <text x="35" y="39" text-anchor="middle" font-family="Playfair Display,serif" font-style="italic" font-size="21" fill="#6b4e10">B&amp;A</text>
-          </g>
-        </svg>
+        <!-- Wax seal: gold, hand-pressed look (static/imgs/wax-seal-gold.png) -->
+        <img class="e-seal" src="static/imgs/wax-seal-gold.png" alt="" aria-hidden="true" width="480" height="480">
       </button>
     </div>
 
@@ -745,11 +730,9 @@
   <div class="wrap">
     <p class="rv">Your presence is the greatest gift.<br>We cannot wait to celebrate with you.</p>
     <div class="rule rv"></div>
-    <!-- Copy of the e-card from the envelope (monogram + names + date). Same pieces: .mono / .nm / .dt -->
+    <!-- Copy of the e-card from the envelope: the capsule monogram (B&A + names + date are all inside the image) -->
     <div class="e-card ec-final rv">
-      <img class="mono" src="static/imgs/monogram-exact.png" alt="B and A monogram" width="1230" height="854">
-      <span class="nm">Brian <span class="amp">&amp;</span> Amylou</span>
-      <span class="dt">12.15.2026</span>
+      <img class="capsule" src="static/imgs/capsule.svg" alt="Brian &amp; Amylou, B&amp;A monogram, 12.15.26">
     </div>
   </div>
 </section>
