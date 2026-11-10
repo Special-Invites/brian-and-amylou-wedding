@@ -89,6 +89,9 @@
   .hero { position: relative; min-height: 100vh; display: flex; align-items: center; text-align: center; padding: 110px 0 70px; overflow: hidden; }
   .names { font-size: clamp(40px, 11.5vw, 62px); line-height: 1.08; font-weight: 400; font-style: italic; margin: 22px 0 0; }
   .names .amp { display: block; font-size: .55em; color: var(--blue); margin: 4px 0; }
+  /* Readable "J" for Julian: the italic font's own J is a swash that looks like an F, so we use the upright (roman) J of the same font,
+     slanted to match the italic letters. Same font, same weight, so it blends in. */
+  .jscript { font-style: normal; display: inline-block; transform: skewX(-12deg); padding-right: .04em; }
   .lead { font-style: italic; line-height: 1.75; max-width: 420px; margin: 0 auto; color: #4a1420; }
   .date-big { font-family: var(--font-label); letter-spacing: .3em; text-transform: uppercase; font-size: 15px; font-weight: 600; color: var(--blue); }
   .arch { width: min(290px, 78%); aspect-ratio: 3 / 4; margin: 44px auto 0; padding: 8px; border: 1px solid var(--gold); border-radius: 999px 999px 0 0; box-shadow: 1px 1px 0 #fff inset, 0 10px 26px rgba(107,29,42,.18); background: rgba(255,255,255,.35); }
@@ -419,7 +422,7 @@
 
     <div>
       <div class="intro-title">We Invite You<br>As We Say <i class="hl">I Do</i></div>
-      <div class="intro-names">Brian Julian &amp; Amylou Gimeno</div>
+      <div class="intro-names">Brian <span class="jscript">J</span>ulian &amp; Amylou Gimeno</div>
     </div>
 
     <div class="env-wrap" id="env-wrap">
@@ -458,7 +461,7 @@
   <svg class="spr tr dk" viewBox="-10 -10 125 190" aria-hidden="true"><use href="#sprig" fill="#fff" fill-opacity=".6" stroke="#fff" transform="translate(1 1)"/><use href="#sprig" fill="#d8c29a" fill-opacity=".4" stroke="#c9b283" stroke-width=".8"/></svg>
   <div class="wrap">
     <p class="eyebrow rv">Together with our families</p>
-    <h1 class="names rv">Brian Julian<span class="amp">&amp;</span>Amylou Gimeno</h1>
+    <h1 class="names rv">Brian <span class="jscript">J</span>ulian<span class="amp">&amp;</span>Amylou Gimeno</h1>
     <div class="rule rv"></div>
     <p class="lead rv">request the pleasure of your company at the celebration of our wedding</p>
     <p class="date-big rv" style="margin-top:24px">December 15, 2026</p>
