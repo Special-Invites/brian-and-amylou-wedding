@@ -878,7 +878,7 @@
 </section>
 
 <!-- ===== GUEST WALL =====
-     Guests (even those who can't come) leave a note. Notes are held until YOU approve them in the Google Sheet, then they show here.
+     Guests (even those who can't come) leave a note. Notes post automatically; hide any of them by typing x in the "Hide" column of the Sheet.
      Connect it in the "GUEST WALL" block of the script at the bottom. Open the site with ?wall=preview to see it with sample notes. -->
 <section class="wall dark burg" id="wall">
   <div class="wrap">
@@ -896,7 +896,7 @@
       <div class="wall-hp" aria-hidden="true"><label for="wall-site">Website</label><input type="text" id="wall-site" tabindex="-1" autocomplete="off"></div>
       <div class="wall-err" id="wall-err" role="alert"></div>
       <button type="submit" class="wall-send" id="wall-send">Post to the wall</button>
-      <p class="wall-ok" id="wall-ok" role="status">Thank you! Your message will appear on the wall once Brian &amp; Amylou have approved it.</p>
+      <p class="wall-ok" id="wall-ok" role="status">Thank you! Your message is now on the wall.</p>
     </form>
 
     <h3 class="wall-sub rv">Messages for the couple</h3>
@@ -1283,12 +1283,13 @@
   // ===== GUEST WALL =====
   // HOW TO CONNECT (full walk-through is in the commit notes):
   //  1. Make a SECOND Google Form with 2 questions: Name (short answer) and Message (paragraph). Link it to a Google Sheet.
-  //  2. In the Sheet add column D "Approved" (type  yes  on the rows you want to show) and a tab called "Wall" that lists ONLY approved rows.
-  //  3. Publish ONLY the "Wall" tab to the web as CSV and paste that link into  csv  below.
+  //  2. AUTO-POST: notes show up on their own. In the Sheet's responses tab (Timestamp | Name | Message) you may add a column "Hide":
+  //     type  x  on any row you want removed from the wall.
+  //  3. File > Share > Publish to the web > pick ONLY that responses tab > CSV, and paste that link into  csv  below.
   //  4. Paste the form's "formResponse" address into  action  and each question's entry.XXXXXXXX number into  fields.
   // Until all of those are filled in, the form says "Opens soon" and nothing is sent. Add  ?wall=preview  to the address to see sample notes.
   var WALL = {
-    action: 'https://docs.google.com/forms/d/e/1FAIpQLScKb35ZF8ud3Z9EjvflsYXwUZNcKI8R1hO_RJq1Dw1kC_hf7A/formResponse',                                  // https://docs.google.com/forms/d/e/XXXXXXXX/formResponse
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLScKb35ZF8ud3Z9EjvflsYXwUZNcKI8R1hO_RJq1Dw1kC_hf7A/viewform',                                  // https://docs.google.com/forms/d/e/XXXXXXXX/formResponse
     fields: { name: 'entry.1766925604', message: 'entry.526015134' },           // { name: 'entry.1111111111', message: 'entry.2222222222' }
     csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVQmAKZhcDayZAifBESRz1L7Jr_K7F6vjeRUH8oy4K-ILhynzWQ8z-vBKs87ucaI_AlNZcm5FHVHCt/pub?gid=134405945&single=true&output=csv'                                      // https://docs.google.com/spreadsheets/d/e/XXXXXXXX/pub?gid=0&single=true&output=csv
   };
@@ -1354,12 +1355,22 @@
     fetch(WALL.csv + (WALL.csv.indexOf('?') > -1 ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined })
       .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('bad status'); return r.text(); })
       .then(function (txt) {
-        var rows = parseCsv(txt), items = [];
-        rows.forEach(function (r, i) {
-          if (i === 0 && /^name$/i.test((r[0] || '').trim())) return;          // skip the header row
-          var n = (r[0] || '').trim().slice(0, 60), m = (r[1] || '').trim().slice(0, 300);
+        // Works with the raw "Form Responses" tab (Timestamp | Name | Message | optional Hide) OR a plain Name | Message tab.
+        // Columns are found by their header names; if there is no header row we fall back to Name = col A, Message = col B.
+        var rows = parseCsv(txt), items = [], cName = 0, cMsg = 1, cHide = -1, start = 0;
+        if (rows.length) {
+          var head = rows[0].map(function (h) { return (h || '').trim().toLowerCase(); });
+          var iN = head.indexOf('name'), iM = -1, iH = -1;
+          head.forEach(function (h, k) { if (iM < 0 && /^(your )?(message|note)/.test(h)) iM = k; if (iH < 0 && /^(hide|hidden)$/.test(h)) iH = k; });
+          if (iN > -1 && iM > -1) { cName = iN; cMsg = iM; cHide = iH; start = 1; }
+          else if (/^(timestamp|name)$/.test(head[0] || '')) { start = 1; }   // header exists but with unknown titles
+        }
+        for (var i = rows.length - 1; i >= start; i--) {                          // newest response first
+          var r = rows[i];
+          if (cHide > -1 && /^(x|y|yes|hide|hidden|true)$/i.test((r[cHide] || '').trim())) continue;   // you typed x in "Hide" = removed
+          var n = (r[cName] || '').trim().slice(0, 60), m = (r[cMsg] || '').trim().slice(0, 300);
           if (n && m) items.push({ name: n, message: m });
-        });
+        }
         setWall(items);
       })
       .catch(function () {
@@ -1388,6 +1399,8 @@
     wallErr.textContent = err; if (err) return;
 
     function done() {
+      // show the guest's own note on the wall right away; Google's published sheet can lag a few minutes behind
+      if (!wallPreview || wallCanSend) { wallItems.unshift({ name: name, message: msg }); wallShown = Math.min(wallItems.length, Math.max(wallShown, WALL_PAGE) + 1); renderWall(); }
       wallStamp(); wallForm.reset(); wallCount.textContent = '0'; wallSend.disabled = false; wallSend.textContent = 'Post to the wall';
       wallForm.classList.add('sent');
     }
