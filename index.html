@@ -308,6 +308,14 @@
   @media (max-width: 380px) { .intro-title { font-size: 27px; } .unit { width: 64px; } }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01s !important; transition-delay: 0s !important; } }
 
+  /* ===== BACKGROUND MUSIC: round mute / play button (bottom-right). Hidden until the envelope is opened. ===== */
+  .music-btn { position: fixed; right: max(14px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 250; width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid rgba(233,210,126,.85); background: rgba(107,29,42,.88); color: #e9d27e; box-shadow: 0 4px 14px rgba(0,0,0,.35); opacity: 0; visibility: hidden; transition: opacity .6s ease, visibility .6s; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .music-btn.show { opacity: 1; visibility: visible; }
+  .music-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .music-btn .ico-off { display: none; }
+  .music-btn.muted .ico-on { display: none; } .music-btn.muted .ico-off { display: block; }
+  .music-btn:focus-visible { outline: 2px solid #e9d27e; outline-offset: 3px; }
+
   /* ===== RSVP PAPER CARD: fill in -> folds in three -> slides into an envelope -> wax seal -> sent =====
      Sizes: --pw/--ph = paper width / height of ONE third. --ew/--eh = envelope size. */
   .rsvp-modal { --pw: 300px; --ph: 200px; --ew: 326px; --eh: 196px; background: rgba(20,4,8,.86); overflow: hidden; }
@@ -943,6 +951,13 @@
   </div>
 </div>
 
+<!-- BACKGROUND MUSIC: starts (and loops) when the envelope is opened. File: static/audio/wedding-song.mp3 -->
+<audio id="bgm" src="static/audio/wedding-song.mp3" loop preload="auto"></audio>
+<button type="button" class="music-btn" id="music-btn" aria-label="Mute the music" aria-pressed="false">
+  <svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+  <svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+</button>
+
 <script>
   var intro = document.getElementById('intro');
 
@@ -1015,6 +1030,47 @@
   paintFoil();
   window.addEventListener('resize', function () { if (!revealed && !drawing) paintFoil(); });
 
+  // ===== BACKGROUND MUSIC =====
+  // Phones only allow sound after a tap, so the song starts from the envelope tap (see openEnvelope) and loops forever.
+  // The round button (bottom-right) mutes / un-mutes. The song pauses when the guest leaves the tab and resumes when they come back.
+  var bgm = document.getElementById('bgm'), musicBtn = document.getElementById('music-btn');
+  var MUSIC_VOL = 0.55, musicStarted = false, musicMuted = false, fadeT = null;
+  function setMusicUI() {
+    musicBtn.classList.toggle('muted', musicMuted);
+    musicBtn.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
+    musicBtn.setAttribute('aria-label', musicMuted ? 'Play the music' : 'Mute the music');
+  }
+  function fadeTo(target, ms, done) {
+    clearInterval(fadeT);
+    var from = bgm.volume, t0 = Date.now();
+    fadeT = setInterval(function () {
+      var k = Math.min(1, (Date.now() - t0) / ms);
+      bgm.volume = Math.max(0, Math.min(1, from + (target - from) * k));
+      if (k >= 1) { clearInterval(fadeT); if (done) done(); }
+    }, 50);
+  }
+  function startMusic() {
+    if (musicStarted || musicMuted) return;
+    try {
+      bgm.volume = 0;
+      var pr = bgm.play();
+      var ok = function () { musicStarted = true; fadeTo(MUSIC_VOL, 2500); };
+      if (pr && pr.then) { pr.then(ok).catch(function () { /* blocked: the next tap anywhere will try again (see below) */ }); } else { ok(); }
+    } catch (e) {}
+  }
+  musicBtn.addEventListener('click', function () {
+    musicMuted = !musicMuted; setMusicUI();
+    if (musicMuted) { fadeTo(0, 300, function () { bgm.pause(); }); }
+    else { musicStarted = false; startMusic(); }
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (!musicStarted) return;
+    if (document.hidden) { bgm.pause(); } else if (!musicMuted) { bgm.play().catch(function () {}); }
+  });
+  // Safety net: if the browser refused the first play(), the next tap anywhere starts the music (only after the envelope is open).
+  document.addEventListener('pointerdown', function () { if (intro.classList.contains('open') && !musicStarted && !musicMuted) startMusic(); }, { passive: true });
+  setMusicUI();
+
   // ===== OPEN THE ENVELOPE =====
   function startReveal() {
     var io = new IntersectionObserver(function (entries) {
@@ -1025,6 +1081,7 @@
   function openEnvelope() {
     if (intro.classList.contains('open')) return;
     intro.classList.add('open');
+    startMusic(); musicBtn.classList.add('show');   // the envelope tap is the "tap" browsers need before they allow sound
     setTimeout(function () { intro.classList.add('out'); startReveal(); }, 2400);
     setTimeout(function () { document.body.classList.remove('locked'); intro.style.display = 'none'; window.scrollTo(0, 0); }, 3400);
   }
