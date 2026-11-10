@@ -199,7 +199,7 @@
   .qr-open { padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; transition: transform .25s ease; }
   .qr-open:hover, .qr-open:focus-visible { transform: scale(1.06); }
 
-  /* ===== GIFT POP-UP (choose GCash or UnionBank) ===== */
+  /* ===== GIFT POP-UP (choose GCash, UnionBank, MariBank or Revolut) ===== */
   .modal { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(20,4,8,.78); }
   .modal.show { display: flex; }
   .modal-card { position: relative; width: min(360px, 100%); max-height: calc(100vh - 36px); max-height: calc(100dvh - 36px); overflow-y: auto; background: var(--paper); color: var(--burgundy); border: 1px solid rgba(212,175,55,.8); padding: 30px 20px 22px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
@@ -207,6 +207,8 @@
   .modal h3 { margin: 0 0 14px; font-weight: 400; font-style: italic; font-size: 26px; }
   .tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--burgundy); margin-bottom: 16px; }
   .tabs button { border: 0; background: none; padding: 12px 0; font-family: var(--font-label); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--burgundy); }
+  .tabs button:nth-child(even) { border-left: 1px solid var(--burgundy); }
+  .tabs button:nth-child(n+3) { border-top: 1px solid var(--burgundy); }
   .tabs button[aria-selected="true"] { background: var(--burgundy); color: var(--paper); }
   .pane { display: none; }
   .pane.on { display: block; }
@@ -684,7 +686,7 @@
           <p>Your presence is the greatest gift. Should you wish to give more, a monetary gift is warmly appreciated.</p>
         </div>
         <div class="qr">
-          <!-- Tapping this button opens the pop-up (id="gift-modal") where guests choose GCash or UnionBank -->
+          <!-- Tapping this button opens the pop-up (id="gift-modal") where guests choose GCash, UnionBank, MariBank or Revolut -->
           <button type="button" class="badge-box qr-open" id="gift-open" aria-haspopup="dialog" aria-label="Open gift QR codes">
             <svg viewBox="0 0 100 100" aria-hidden="true">
               <circle cx="50" cy="50" r="46" fill="none" stroke="#b8902f" stroke-width="1.5"/>
@@ -905,7 +907,7 @@
   </div>
 </section>
 
-<section class="closing dark burg">
+<section class="closing dark navy">
   <svg class="spr bl dk" viewBox="-10 -10 125 190" aria-hidden="true"><use href="#sprig" fill="#fff" fill-opacity=".6" stroke="#fff" transform="translate(1 1)"/><use href="#sprig" fill="#d8c29a" fill-opacity=".4" stroke="#c9b283" stroke-width=".8"/></svg>
   <svg class="spr br dk" viewBox="-10 -10 125 190" aria-hidden="true"><use href="#sprig" fill="#fff" fill-opacity=".6" stroke="#fff" transform="translate(1 1)"/><use href="#sprig" fill="#d8c29a" fill-opacity=".4" stroke="#c9b283" stroke-width=".8"/></svg>
   <div class="wrap">
@@ -1006,6 +1008,8 @@
     <div class="tabs" role="tablist">
       <button type="button" role="tab" id="tab-gcash" aria-selected="true" data-pane="pane-gcash">GCash</button>
       <button type="button" role="tab" id="tab-union" aria-selected="false" data-pane="pane-union">UnionBank</button>
+      <button type="button" role="tab" id="tab-mari" aria-selected="false" data-pane="pane-mari">MariBank</button>
+      <button type="button" role="tab" id="tab-revolut" aria-selected="false" data-pane="pane-revolut">Revolut</button>
     </div>
     <div class="pane on" id="pane-gcash" role="tabpanel" aria-labelledby="tab-gcash">
       <img src="static/imgs/qr-gcash-crop.jpg" alt="GCash QR code" loading="lazy">
@@ -1016,6 +1020,16 @@
       <img src="static/imgs/qr-union-bank-crop.jpg" alt="UnionBank QR code" loading="lazy">
       <p>Scan with your banking app, or save it and upload it from your gallery.</p>
       <a class="btn" href="static/imgs/qr-union-bank-crop.jpg" download="Gift-UnionBank-QR.jpg">Save QR</a>
+    </div>
+    <div class="pane" id="pane-mari" role="tabpanel" aria-labelledby="tab-mari">
+      <img src="static/imgs/qr-maribank-crop.jpg" alt="MariBank QR code" loading="lazy">
+      <p>Scan with your banking app, or save it and upload it from your gallery.</p>
+      <a class="btn" href="static/imgs/qr-maribank-crop.jpg" download="Gift-MariBank-QR.jpg">Save QR</a>
+    </div>
+    <div class="pane" id="pane-revolut" role="tabpanel" aria-labelledby="tab-revolut">
+      <img src="static/imgs/qr-revolut-crop.jpg" alt="Revolut QR code" loading="lazy">
+      <p>Scan with your phone camera or Revolut app, or save it and upload it from your gallery.</p>
+      <a class="btn" href="static/imgs/qr-revolut-crop.jpg" download="Gift-Revolut-QR.jpg">Save QR</a>
     </div>
   </div>
 </div>
@@ -1031,7 +1045,7 @@
   var intro = document.getElementById('intro');
 
   // ===== GIFT POP-UP =====
-  // Tap the gold QR button -> pop-up opens. Tabs switch between GCash and UnionBank.
+  // Tap the gold QR button -> pop-up opens. Tabs switch between GCash, UnionBank, MariBank and Revolut.
   // Closes with the X, a tap outside the card, or the Esc key.
   var gm = document.getElementById('gift-modal'), gOpen = document.getElementById('gift-open');
   function setPane(id) {
