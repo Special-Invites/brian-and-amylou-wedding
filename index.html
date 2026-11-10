@@ -308,6 +308,37 @@
   @media (max-width: 380px) { .intro-title { font-size: 27px; } .unit { width: 64px; } }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: .01s !important; transition-delay: 0s !important; } }
 
+  /* ===== GUEST WALL: leave-a-note form + approved messages (read from a published Google Sheet tab) ===== */
+  .wall { text-align: center; padding: 80px 0 70px; }
+  .wall .eyebrow { color: #e3cf8f; }
+  .wall .lead { color: var(--champagne); margin-bottom: 28px; }
+  .wall-form { position: relative; text-align: left; background: var(--paper); border: 1px solid rgba(212,175,55,.6); box-shadow: inset 0 1px 0 #fff, 0 8px 22px rgba(0,0,0,.3); padding: 24px 20px 22px; color: var(--burgundy); }
+  .wall-form::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(212,175,55,.55); pointer-events: none; }
+  .wall-form > * { position: relative; }
+  .wall-form label { display: block; font-family: var(--font-label); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; margin: 0 0 6px; }
+  .wall-form label + input, .wall-form label + textarea { margin-bottom: 16px; }
+  .wall-form input[type=text], .wall-form textarea { display: block; width: 100%; border: 1px solid rgba(107,29,42,.35); border-radius: 0; background: rgba(255,255,255,.65); color: var(--burgundy); font-family: var(--font-display); font-size: 16px; line-height: 1.5; padding: 10px 12px; outline: none; -webkit-appearance: none; appearance: none; }
+  .wall-form textarea { resize: vertical; min-height: 110px; }
+  .wall-form input:focus, .wall-form textarea:focus { border-color: #B8902F; box-shadow: 0 0 0 1px #B8902F; }
+  .wall-form ::placeholder { font-style: italic; color: rgba(107,29,42,.45); }
+  .wall-count { margin: -12px 2px 12px; text-align: right; font-family: var(--font-label); font-size: 10px; letter-spacing: .14em; color: rgba(107,29,42,.6); }
+  .wall-hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  .wall-err { min-height: 18px; margin: 0 0 8px; font-style: italic; font-size: 14px; line-height: 1.3; color: #9b1c2e; }
+  .wall-ok { display: none; margin: 14px 0 0; text-align: center; font-style: italic; font-size: 15px; line-height: 1.5; color: var(--burgundy); }
+  .wall-form.sent .wall-ok { display: block; }
+  .wall-send { display: block; width: 100%; padding: 14px 20px; border: 1px solid var(--burgundy); background: var(--burgundy); color: #fbf4e6; font-family: var(--font-label); font-weight: 600; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; cursor: pointer; }
+  .wall-send:disabled { opacity: .6; cursor: default; }
+  .wall-sub { margin: 44px 0 18px; font-family: var(--font-label); font-size: 12px; letter-spacing: .3em; text-transform: uppercase; font-weight: 600; color: #e9d27e; }
+  .wall-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .wall-msg { display: flex; gap: 14px; align-items: flex-start; background: var(--paper); border: 1px solid rgba(212,175,55,.6); box-shadow: inset 0 1px 0 #fff, 0 6px 16px rgba(0,0,0,.22); padding: 16px 16px 16px 14px; color: var(--burgundy); }
+  .wall-av { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--burgundy); border: 1px solid #D4AF37; color: #f3e7c9; font-family: var(--font-label); font-weight: 600; font-size: 13px; letter-spacing: .05em; }
+  .wall-body { min-width: 0; }
+  .wall-name { margin: 2px 0 4px; font-family: var(--font-label); font-weight: 600; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; overflow-wrap: anywhere; }
+  .wall-text { margin: 0; font-style: italic; font-size: 17px; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
+  .wall-note { margin: 6px 0; font-style: italic; color: #e9d9b5; }
+  .wall-more { margin-top: 22px; }
+  .wall-more[hidden] { display: none; }
+
   /* ===== BACKGROUND MUSIC: round mute / play button (bottom-right). Hidden until the envelope is opened. ===== */
   .music-btn { position: fixed; right: max(14px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 250; width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid rgba(233,210,126,.85); background: rgba(107,29,42,.88); color: #e9d27e; box-shadow: 0 4px 14px rgba(0,0,0,.35); opacity: 0; visibility: hidden; transition: opacity .6s ease, visibility .6s; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .music-btn.show { opacity: 1; visibility: visible; }
@@ -846,6 +877,34 @@
   </div>
 </section>
 
+<!-- ===== GUEST WALL =====
+     Guests (even those who can't come) leave a note. Notes are held until YOU approve them in the Google Sheet, then they show here.
+     Connect it in the "GUEST WALL" block of the script at the bottom. Open the site with ?wall=preview to see it with sample notes. -->
+<section class="wall dark burg" id="wall">
+  <div class="wrap">
+    <p class="eyebrow rv">Words from the heart</p>
+    <h2 class="rv ttl"><svg class="flr" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg><span>Guest <i>Wall</i></span><svg class="flr r" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg></h2>
+    <p class="lead rv">Whether you can join us or not, we would love to read your wishes.</p>
+
+    <form class="wall-form rv" id="wall-form" novalidate autocomplete="off">
+      <label for="wall-name">Your name</label>
+      <input type="text" id="wall-name" maxlength="60" placeholder="Write your name" autocomplete="name">
+      <label for="wall-msg">Your message</label>
+      <textarea id="wall-msg" maxlength="300" rows="4" placeholder="Write a note for Brian &amp; Amylou"></textarea>
+      <div class="wall-count" aria-hidden="true"><span id="wall-count">0</span>/300</div>
+      <!-- honeypot: real guests never see this; bots fill it in and get ignored -->
+      <div class="wall-hp" aria-hidden="true"><label for="wall-site">Website</label><input type="text" id="wall-site" tabindex="-1" autocomplete="off"></div>
+      <div class="wall-err" id="wall-err" role="alert"></div>
+      <button type="submit" class="wall-send" id="wall-send">Post to the wall</button>
+      <p class="wall-ok" id="wall-ok" role="status">Thank you! Your message will appear on the wall once Brian &amp; Amylou have approved it.</p>
+    </form>
+
+    <h3 class="wall-sub rv">Messages for the couple</h3>
+    <div class="wall-list" id="wall-list" aria-live="polite"></div>
+    <button type="button" class="link-btn wall-more" id="wall-more" hidden>Show more</button>
+  </div>
+</section>
+
 <section class="closing dark burg">
   <svg class="spr bl dk" viewBox="-10 -10 125 190" aria-hidden="true"><use href="#sprig" fill="#fff" fill-opacity=".6" stroke="#fff" transform="translate(1 1)"/><use href="#sprig" fill="#d8c29a" fill-opacity=".4" stroke="#c9b283" stroke-width=".8"/></svg>
   <svg class="spr br dk" viewBox="-10 -10 125 190" aria-hidden="true"><use href="#sprig" fill="#fff" fill-opacity=".6" stroke="#fff" transform="translate(1 1)"/><use href="#sprig" fill="#d8c29a" fill-opacity=".4" stroke="#c9b283" stroke-width=".8"/></svg>
@@ -932,6 +991,7 @@
       <h3 id="thanks-h">Thank you!</h3>
       <p id="thanks-p">Your reply is on its way to Brian &amp; Amylou.</p>
       <button type="button" class="btn-gold" id="rsvp-done">Close</button>
+      <button type="button" class="link-btn" id="rsvp-wall">Leave a message on our guest wall</button>
       <button type="button" class="link-btn" id="rsvp-again">Send another reply</button>
     </div>
   </div>
@@ -1219,6 +1279,140 @@
     });
   });
   syncPlus();
+
+  // ===== GUEST WALL =====
+  // HOW TO CONNECT (full walk-through is in the commit notes):
+  //  1. Make a SECOND Google Form with 2 questions: Name (short answer) and Message (paragraph). Link it to a Google Sheet.
+  //  2. In the Sheet add column D "Approved" (type  yes  on the rows you want to show) and a tab called "Wall" that lists ONLY approved rows.
+  //  3. Publish ONLY the "Wall" tab to the web as CSV and paste that link into  csv  below.
+  //  4. Paste the form's "formResponse" address into  action  and each question's entry.XXXXXXXX number into  fields.
+  // Until all of those are filled in, the form says "Opens soon" and nothing is sent. Add  ?wall=preview  to the address to see sample notes.
+  var WALL = {
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLScKb35ZF8ud3Z9EjvflsYXwUZNcKI8R1hO_RJq1Dw1kC_hf7A/formResponse',                                  // https://docs.google.com/forms/d/e/XXXXXXXX/formResponse
+    fields: { name: 'entry.1766925604', message: 'entry.526015134' },           // { name: 'entry.1111111111', message: 'entry.2222222222' }
+    csv: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVQmAKZhcDayZAifBESRz1L7Jr_K7F6vjeRUH8oy4K-ILhynzWQ8z-vBKs87ucaI_AlNZcm5FHVHCt/pub?gid=134405945&single=true&output=csv'                                      // https://docs.google.com/spreadsheets/d/e/XXXXXXXX/pub?gid=0&single=true&output=csv
+  };
+  var WALL_PAGE = 6;                             // how many notes show at first, and per "Show more"
+  var wallPreview = /[?&]wall=preview/.test(location.search);
+  var wallCanSend = !!(WALL.action && WALL.fields.name && WALL.fields.message);
+  var wallForm = document.getElementById('wall-form'), wallList = document.getElementById('wall-list');
+  var wallMoreBtn = document.getElementById('wall-more'), wallErr = document.getElementById('wall-err');
+  var wallSend = document.getElementById('wall-send'), wallName = document.getElementById('wall-name');
+  var wallMsg = document.getElementById('wall-msg'), wallCount = document.getElementById('wall-count');
+  var wallItems = [], wallShown = 0;
+
+  var WALL_SAMPLES = [
+    ['Ate Joy & Kuya Mark', 'Wishing you a lifetime of love and laughter. Sorry we cannot be there, but we will be celebrating with you in spirit!'],
+    ['Tita Nena', 'So happy for you both. Praying for a marriage full of grace and joy. God bless you!'],
+    ['The Reyes Family', 'Congratulations, Brian & Amylou! You two are perfect for each other.'],
+    ['Carlo Mendoza', 'Cheers to the happy couple! Cannot wait to see the photos.'],
+    ['Lola Fely', 'Mahal na mahal namin kayo. Ingat po kayo palagi at maging masaya.'],
+    ['Joan & Paul', 'Wishing you both a beautiful forever.'],
+    ['Team Brian', 'Congrats, pare! Sulit ang paghihintay. See you at the reception!']
+  ];
+
+  // tiny CSV reader (handles quotes, commas and line breaks inside a note)
+  function parseCsv(text) {
+    var rows = [], row = [], cur = '', q = false, i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else { q = false; } } else { cur += c; }
+      } else if (c === '"') { q = true; }
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c !== '\r') { cur += c; }
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  function initials(name) {
+    var w = name.replace(/[^A-Za-z\u00C0-\u024F&\s]/g, ' ').split(/\s+/).filter(Boolean);
+    var a = (w[0] || '?').charAt(0), b = w.length > 1 ? w[1].charAt(0) : '';
+    return (a + b).toUpperCase();
+  }
+  function wallNote(text) { wallList.innerHTML = ''; var p = document.createElement('p'); p.className = 'wall-note'; p.textContent = text; wallList.appendChild(p); return p; }
+  function renderWall() {
+    wallList.innerHTML = '';
+    if (!wallItems.length) { wallNote('Be the first to leave a note for the couple.'); wallMoreBtn.hidden = true; return; }
+    wallItems.slice(0, wallShown).forEach(function (m) {
+      var card = document.createElement('div'); card.className = 'wall-msg';
+      var av = document.createElement('div'); av.className = 'wall-av'; av.setAttribute('aria-hidden', 'true'); av.textContent = initials(m.name);
+      var body = document.createElement('div'); body.className = 'wall-body';
+      var nm = document.createElement('p'); nm.className = 'wall-name'; nm.textContent = m.name;          // textContent = notes can never inject HTML
+      var tx = document.createElement('p'); tx.className = 'wall-text'; tx.textContent = m.message;
+      body.appendChild(nm); body.appendChild(tx); card.appendChild(av); card.appendChild(body); wallList.appendChild(card);
+    });
+    wallMoreBtn.hidden = wallShown >= wallItems.length;
+  }
+  function setWall(items) { wallItems = items; wallShown = Math.min(WALL_PAGE, items.length); renderWall(); }
+  function loadWall() {
+    if (wallPreview) { setWall(WALL_SAMPLES.map(function (m) { return { name: m[0], message: m[1] }; })); return; }
+    if (!WALL.csv) { wallNote('Messages from our guests will appear here.'); return; }
+    wallNote('Loading messages…');
+    var ctl = ('AbortController' in window) ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+    fetch(WALL.csv + (WALL.csv.indexOf('?') > -1 ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store', signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('bad status'); return r.text(); })
+      .then(function (txt) {
+        var rows = parseCsv(txt), items = [];
+        rows.forEach(function (r, i) {
+          if (i === 0 && /^name$/i.test((r[0] || '').trim())) return;          // skip the header row
+          var n = (r[0] || '').trim().slice(0, 60), m = (r[1] || '').trim().slice(0, 300);
+          if (n && m) items.push({ name: n, message: m });
+        });
+        setWall(items);
+      })
+      .catch(function () {
+        clearTimeout(t);
+        var p = wallNote('We could not load the messages right now. ');
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'link-btn'; b.textContent = 'Try again'; b.addEventListener('click', loadWall);
+        wallList.appendChild(b);
+      });
+  }
+  wallMoreBtn.addEventListener('click', function () { wallShown = Math.min(wallItems.length, wallShown + WALL_PAGE); renderWall(); });
+
+  if (!wallCanSend && !wallPreview) { wallSend.disabled = true; wallSend.textContent = 'Opens soon'; }
+  wallMsg.addEventListener('input', function () { wallCount.textContent = wallMsg.value.length; });
+  wallForm.addEventListener('input', function () { wallErr.textContent = ''; wallForm.classList.remove('sent'); });
+
+  function wallLast() { try { return parseInt(localStorage.getItem('wall-last') || '0', 10) || 0; } catch (e) { return 0; } }
+  function wallStamp() { try { localStorage.setItem('wall-last', String(Date.now())); } catch (e) {} }
+
+  wallForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = wallName.value.trim(), msg = wallMsg.value.trim(), err = '';
+    if (!name) { err = 'Please write your name.'; wallName.focus(); }
+    else if (msg.length < 2) { err = 'Please write your message.'; wallMsg.focus(); }
+    else if (/https?:\/\/|www\./i.test(name + ' ' + msg)) { err = 'Please leave out links, thank you!'; wallMsg.focus(); }
+    else if (Date.now() - wallLast() < 30000) { err = 'Please wait a few seconds before posting again.'; }
+    wallErr.textContent = err; if (err) return;
+
+    function done() {
+      wallStamp(); wallForm.reset(); wallCount.textContent = '0'; wallSend.disabled = false; wallSend.textContent = 'Post to the wall';
+      wallForm.classList.add('sent');
+    }
+    if (document.getElementById('wall-site').value) { done(); return; }          // honeypot filled = a bot: pretend it worked, send nothing
+    if (wallPreview && !wallCanSend) { done(); return; }                          // preview mode: no sending
+    wallSend.disabled = true; wallSend.textContent = 'Sending…';
+    var body = new URLSearchParams(); body.append(WALL.fields.name, name); body.append(WALL.fields.message, msg);
+    var ctl = ('AbortController' in window) ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+    // no-cors: Google does not let a web page read its answer, so "no error" = it went through
+    fetch(WALL.action, { method: 'POST', mode: 'no-cors', body: body, signal: ctl ? ctl.signal : undefined })
+      .then(function () { clearTimeout(t); done(); }, function () {
+        clearTimeout(t); wallSend.disabled = false; wallSend.textContent = 'Post to the wall';
+        wallErr.textContent = 'Could not send. Please check your connection and try again.';
+      });
+  });
+
+  // RSVP thank-you screen -> close the card and jump to the guest wall
+  document.getElementById('rsvp-wall').addEventListener('click', function () {
+    closeRsvp(); if (rBusy) return;
+    setTimeout(function () {
+      document.getElementById('wall').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      setTimeout(function () { wallName.focus({ preventScroll: true }); }, reduceMotion ? 0 : 700);
+    }, 80);
+  });
+  loadWall();
 
   // ===== COUNTDOWN =====
   // Target: December 15, 2026, 1:30 PM (month is 0-based, so 11 = December; 13 = 1 PM in 24-hour time, 30 = minutes)
