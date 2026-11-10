@@ -339,8 +339,7 @@
   .f-top, .f-mid, .f-bot { display: flex; flex-direction: column; justify-content: center; }
   .f-top { padding-top: 14px; }
   .r-kick { font-family: var(--font-label); font-size: 10px; letter-spacing: .3em; text-transform: uppercase; font-weight: 600; color: #B8902F; }
-  .r-title { font-family: var(--font-script); font-size: 42px; line-height: 1.05; margin: 2px 0 0; color: var(--burgundy); font-weight: 400; }
-  .r-sub { font-style: italic; font-size: 13px; margin: 0 0 12px; opacity: .85; }
+  .r-kick { line-height: 1.7; margin-bottom: 12px; }
   .lbl { display: block; text-align: left; font-family: var(--font-label); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; color: var(--burgundy); }
   .line { display: block; width: 100%; border: 0; border-bottom: 1px solid var(--burgundy); border-radius: 0; background: transparent; font-family: var(--font-script); font-size: 26px; line-height: 1.15; color: var(--blue); padding: 2px 2px 0; outline: none; -webkit-appearance: none; appearance: none; }
   .line:focus { border-bottom-color: #B8902F; box-shadow: 0 1px 0 #B8902F; }
@@ -358,13 +357,14 @@
   .opts-row { display: flex; gap: 22px; }
   .plus-line { margin-top: 4px; }
   .dim { opacity: .45; pointer-events: none; transition: opacity .3s; }
-  .f-bot { padding-top: 10px; }
+  .f-bot { padding-top: 6px; }
   .r-with { font-style: italic; font-size: 14px; text-align: left; margin: 0; }
-  .r-sig { min-height: 40px; border-bottom: 1px solid var(--burgundy); text-align: left; font-family: var(--font-script); font-size: 28px; line-height: 1.3; color: var(--blue); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .r-err { min-height: 20px; margin: 6px 0 4px; font-style: italic; font-size: 13px; line-height: 1.3; color: #9b1c2e; }
+  .r-names { font-family: var(--font-script); font-size: 30px; line-height: 1.1; text-align: left; margin: 0; color: var(--burgundy); }
+  .r-date { font-family: var(--font-label); font-size: 10px; letter-spacing: .3em; text-align: left; margin: 0; color: #B8902F; font-weight: 600; }
+  .r-err { min-height: 14px; margin: 4px 0 4px; font-style: italic; font-size: 13px; line-height: 1.3; color: #9b1c2e; }
   .r-send { display: inline-block; padding: 12px 28px; border: 1px solid var(--burgundy); background: var(--burgundy); color: #fbf4e6; font-family: var(--font-label); font-weight: 600; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; }
   .r-send:disabled { opacity: .6; cursor: wait; }
-  .r-note { margin: 8px 0 0; font-size: 11px; font-style: italic; opacity: .75; }
+  .r-note { margin: 6px 0 0; font-size: 10.5px; line-height: 1.3; font-style: italic; opacity: .75; }
 
   /* envelope pieces (same look as the intro envelope) */
   .ep { position: absolute; left: calc((var(--pw) - var(--ew)) / 2); top: calc((var(--ph) * 3 - var(--eh)) / 2); width: var(--ew); height: var(--eh); display: block; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
@@ -870,9 +870,7 @@
             <!-- TOP third (folds down): title + name. Its back side is the outside of the folded letter -->
             <div class="p-top">
               <div class="face f-top">
-                <div class="r-kick">Kindly reply</div>
-                <h3 class="r-title" id="rsvp-title">Brian &amp; Amylou</h3>
-                <p class="r-sub">12 · 15 · 2026</p>
+                <div class="r-kick" id="rsvp-title">Kindly reply by<br>November 30, 2026</div>
                 <label class="lbl" for="rsvp-name">Your name</label>
                 <input class="line" id="rsvp-name" type="text" maxlength="60" autocomplete="name" placeholder="Write your full name">
               </div>
@@ -883,10 +881,11 @@
             <div class="p-bot">
               <div class="face f-bot">
                 <p class="r-with">With love,</p>
-                <div class="r-sig" id="rsvp-sig" aria-hidden="true"></div>
+                <p class="r-names">Brian &amp; Amylou</p>
+                <p class="r-date">12.15.26</p>
                 <div class="r-err" id="rsvp-err" role="alert"></div>
                 <button type="submit" class="r-send" id="rsvp-send">Seal &amp; send</button>
-                <p class="r-note">No RSVP = No seat. One plus one at most.</p>
+                <p class="r-note">No RSVP = No seat. Unless otherwise stated, this invite is for 1 seat only.</p>
               </div>
               <div class="face back f-bot"></div>
             </div>
@@ -1074,12 +1073,11 @@
   }
   rForm.addEventListener('change', function () { syncPlus(); rErr.textContent = ''; });
   rForm.addEventListener('input', function () { rErr.textContent = ''; });
-  rName.addEventListener('input', function () { document.getElementById('rsvp-sig').textContent = rName.value; });
 
   function resetRsvp() {
     rTimers.forEach(clearTimeout); rTimers = []; rBusy = false;
     rm.classList.remove('busy', 'no-anim'); STEPS.forEach(function (c) { rm.classList.remove(c); });
-    rForm.reset(); document.getElementById('rsvp-sig').textContent = ''; rErr.textContent = ''; rSend.disabled = false; syncPlus();
+    rForm.reset(); rErr.textContent = ''; rSend.disabled = false; syncPlus();
   }
   function showThanks(attending) {
     document.getElementById('thanks-h').textContent = attending ? 'See you there!' : 'We’ll miss you';
