@@ -236,7 +236,10 @@
   .w3 { width: calc(var(--u) * 3 + var(--gap) * 2); }
   .t1 { background: linear-gradient(135deg, #6B1D2A, #0D2C6B); } .t2 { background: linear-gradient(135deg, #0D2C6B, #56695a); }
   .t3 { background: linear-gradient(135deg, #56695a, #6B1D2A); } .t4 { background: linear-gradient(135deg, #45101a, #071a42); }
-  .hashtag { font-size: 30px; font-style: italic; color: var(--blue); margin: 34px 0 6px; }
+  /* Three stacked hashtags. Font size scales with the screen so the longest one (#AMYmorableDayWithBRIAN) always stays on ONE line. */
+  .hashtags { margin: 30px 0 22px; display: flex; flex-direction: column; gap: 8px; }
+  .hashtag { font-size: clamp(16px, 6.3vw, 30px); font-style: italic; color: var(--blue); white-space: nowrap; line-height: 1.25; }
+  .hashtag .nm { font-weight: 600; font-style: italic; color: var(--champagne); }
   .small { font-family: var(--font-label); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
 
   /* ===== 8. FAQ ===== */
@@ -792,9 +795,13 @@
   </div>
 
   <div class="wrap">
-    <!-- HASHTAG: change to your real hashtag -->
-    <div class="hashtag rv">#BrianAndAmylou</div>
-    <p class="small rv">Share your photos with our wedding hashtag</p>
+    <!-- HASHTAGS: the capitalised part of each one (AMY, BRIAN, JASPER) is wrapped in <b class="nm"> so it stands out -->
+    <div class="hashtags rv">
+      <div class="hashtag">#<b class="nm">AMY</b>morableDayWith<b class="nm">BRIAN</b></div>
+      <div class="hashtag">#<b class="nm"><span class="jscript">J</span>ASPER</b>fectMatchNi<b class="nm">AMY</b></div>
+      <div class="hashtag">#To<b class="nm">AMY</b>finityAnd<b class="nm">BRIAN</b></div>
+    </div>
+    <p class="small rv">Share your photos with our wedding hashtags</p>
   </div>
 </section>
 
