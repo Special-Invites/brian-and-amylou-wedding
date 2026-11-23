@@ -107,8 +107,8 @@
   .cd-names i { margin: 0 .12em; }
   .program h2.script { font-size: clamp(34px, calc((100vw - 48px) / 6.2), 52px); line-height: 1.1; white-space: nowrap; }
   /* same idea as the section titles: --curl is the SMALLEST a curl can be; the text is sized to leave room for it
-     (free width - two curls) / 12.6, and the curls stretch into any space left over (max 90px). Raise the 12.6 if the text ever gets cut off. */
-  .cd-sub { --curl: clamp(48px, 15vw, 72px); display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 30px; font-size: clamp(12px, calc((100vw - 48px - 2 * var(--curl) - 20px) / 12.6), 21px); font-style: italic; letter-spacing: .14em; color: #e3cf8f; }
+     (free width - two curls) / 13.9, and the curls stretch into any space left over (max 90px). Raise the 13.9 if the text ever gets cut off. */
+  .cd-sub { --curl: clamp(48px, 15vw, 72px); display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 30px; font-size: clamp(12px, calc((100vw - 48px - 2 * var(--curl) - 20px) / 13.9), 21px); font-style: italic; letter-spacing: .14em; color: #e3cf8f; }
   .cd-sub .flr { flex: 1 1 var(--curl); min-width: var(--curl); max-width: 90px; stroke-width: 1.6; opacity: 1; }
   .cd-sub span { white-space: nowrap; }
   /* little curl + leaves on each side of the line (the right one is a mirror image) */
@@ -521,7 +521,7 @@
 <section class="count dark burg">
   <div class="wrap">
     <h2 class="rv script cd-names">Brian <i>&amp;</i> Amylou</h2>
-    <p class="cd-sub rv"><svg class="flr" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg><span>countdown to forever</span><svg class="flr r" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg></p>
+    <p class="cd-sub rv"><svg class="flr" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg><span id="cd-label">countdown to forever</span><svg class="flr r" viewBox="0 0 64 18" aria-hidden="true"><use href="#flourish"/></svg></p>
     <div class="timer rv">
       <div class="unit"><span id="cd-days">--</span><small>Days</small></div>
       <div class="unit"><span id="cd-hours">--</span><small>Hours</small></div>
@@ -1445,9 +1445,12 @@
   // Target: December 15, 2026, 1:30 PM (month is 0-based, so 11 = December; 13 = 1 PM in 24-hour time, 30 = minutes)
   var target = new Date(2026, 11, 15, 13, 30, 0);
   function pad(n) { return n < 10 ? '0' + n : String(n); }
+  // Once the moment arrives, the timer flips and counts UP (time since the wedding) and the line changes to "counting up to forever".
+  var cdLabel = document.getElementById('cd-label'), countingUp = false;
   function tick() {
-    var diff = target - new Date(); if (diff <= 0) { diff = 0; }
-    var s = Math.floor(diff / 1000);
+    var diff = target - new Date();
+    if (diff <= 0 && !countingUp) { countingUp = true; cdLabel.textContent = 'counting up to forever'; }
+    var s = Math.floor(Math.abs(diff) / 1000);
     document.getElementById('cd-days').textContent = Math.floor(s / 86400);
     document.getElementById('cd-hours').textContent = pad(Math.floor(s % 86400 / 3600));
     document.getElementById('cd-mins').textContent = pad(Math.floor(s % 3600 / 60));
